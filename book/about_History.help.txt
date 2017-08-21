@@ -1,0 +1,79 @@
+﻿主题
+    about_History
+
+简短说明
+    说明如何检索和运行命令历史记录中的命令。
+
+
+详细说明
+    在命令提示符下输入命令时，Windows PowerShell 将该命令保存在命令历史记录中。可以将该历史记
+    录中的命令用作工作记录。此外，还可以恢复和运行命令历史记录中的命令。
+
+
+  历史记录 Cmdlet
+      Windows PowerShell 有一组用于管理命令历史记录的 cmdlet。
+
+          Cmdlet（别名）         说明
+          -------------------    ------------------------------------------ 
+	  Get-History (h)        获取命令历史记录。
+
+          Invoke-History (r)     运行命令历史记录中的命令。
+
+          Add-History            向命令历史记录中添加命令。
+
+          Clear-History (clh)    从命令历史记录中删除命令。
+
+
+  用于管理历史记录的键盘快捷方式
+      在 Windows PowerShell 控制台中，可以使用以下快捷方式来管理命令历史记录。
+ 
+
+      对于其他主机应用程序，请参阅产品文档。
+
+
+
+          键		    执行的操作
+          -------------     ------------------------
+          向上		    键显示上一个命令。
+ 
+          向下		    键显示下一个命令。
+ 
+          F7		    显示命令历史记录。要隐藏历史记录，请按 Esc。
+ 
+          F8		    查找命令。键入一个或多个字符，然后按 F8。
+			    要查找下一个匹配项，请再次按 F8。
+
+          F9		    按历史记录 ID 查找命令。键入历史记录 ID，
+			    然后按 F9。要查找 ID，请按 F7。
+
+
+  MaximumHistoryCount
+      $MaximumHistoryCount 首选项变量确定 Windows PowerShell 在命令历史记录中
+      最多保存的命令数。默认值为 64，即 Windows PowerShell 最多保存 64 个
+      最近的命令，不过，您可以更改该变量的值。
+      
+
+      例如，以下命令将 $MaximumHistoryCount 增加为 100 个命令：
+
+
+          $MaximumHistoryCount = 100
+
+
+      要应用该设置，请重新启动 Windows PowerShell。
+
+
+      要为所有 Windows PowerShell 会话保存新变量值，请在 Windows PowerShell 配置文件中
+      添加赋值语句。有关详细信息，请参阅 about_Profiles。
+
+
+  历史记录中的命令的顺序
+      命令是在执行完成时（而不是在输入命令时）添加到历史记录的。如果命令需要
+      花一些时间才能完成，或者在嵌套提示中执行，则它们在历史记录中的顺序可能
+      不正确。（只有在退出提示级别时，在该嵌套提示中执行的命令才算完成。）
+
+
+另请参阅
+    about_Line_Editing
+    about_Variables
+    about_Preference_Variables
+

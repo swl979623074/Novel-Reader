@@ -7,19 +7,19 @@ const bookBasePath = path.join(basePath,'book');
 
 const history = require(path.join(basePath,'config','history.json'))
 const tool = require(path.join(basePath,'src','tool.js'));
-const showNovalList = require(path.join(basePath,'src','showNovalList.js'));
+const showNovelList = require(path.join(basePath,'src','showNovelList.js'));
 const showSelectedBook = require(path.join(basePath,'src','showOneBook.js'));
 
-let novalList = [];
+let novelList = [];
 
-let getAndShowNovalList = () => {
+let getAndShowNovelList = () => {
 	return new Promise((resolve,reject)=>{
 		fs.stat(bookBasePath,(err,stats)=>{
 			if(err){
-				reject(`${bookBasePath} is not exist`);
+				reject(`\u001b[31m${bookBasePath} is not exist\u001b[39m`);
 			}else{
 				if(stats.isDirectory()){
-					showNovalList(resolve,reject,novalList);
+					showNovelList(resolve,reject,novelList);
 				}else{
 					reject(`${bookBasePath} must be a directory`) ;
 				}
@@ -33,20 +33,20 @@ let getAndShowNovalList = () => {
 let selectOneBook = () => {
 	return new Promise((resolve,reject)=>{
 		let rl = readline.createInterface(process.stdin,process.stdout);
-		rl.setPrompt(`Please Select One Noval: <1> `);
+		rl.setPrompt(`\u001b[32mPlease Select One Novel: <1> \u001b[39m`);
 		rl.prompt();
 		rl.on('line',(line) => {
 			let flag = false;
 			if(Object.is('',line)){
 				flag = true;
-				history['selected'] = novalList[0];	
+				history['selected'] = novelList[0];	
 			}else if(tool.isNotNumber(line)){
 				console.log(`\u001b[31m#> Warn: Please Input A Number \u001b[39m`);
 			}else{
-				let [index,len] = [parseInt(line),novalList.length];
+				let [index,len] = [parseInt(line),novelList.length];
 				if(index <= len){
 					flag = true;
-					history['selected'] = novalList[index-1];
+					history['selected'] = novelList[index-1];
 				}else{
 					console.log(`\u001b[31m#> Warn: Invalid Input,Please Input A Number Again \u001b[39m`);
 				}
@@ -63,25 +63,9 @@ let selectOneBook = () => {
 }
 
 (()=>{
-	let deployPromise = [getAndShowNovalList,selectOneBook,showSelectedBook];
+	let deployPromise = [getAndShowNovelList,selectOneBook,showSelectedBook];
 	tool.promiseIter(deployPromise).catch((err)=>{
 		if(err)
 			console.log(err)
 	});
 })();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

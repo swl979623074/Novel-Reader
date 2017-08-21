@@ -7,109 +7,116 @@ const basePath = path.join(__dirname);
 const historyPath = path.join(basePath,'..','config','history.json');
 
 const tool = require(path.join(basePath,'tool.js'));
+const desc = require(path.join(basePath,'description.js'));
+const ConfigOper = require(path.join(basePath,'ConfigOper.js'));
 
 let history = require(historyPath);
-let selectedBookName = history['selected'];
-let bookPath = path.join(basePath,'..','book',selectedBookName);
-let config = history[selectedBookName] || {};
-if(Object.is(config[selectedBookName],undefined)){
-	history[selectedBookName] = config;
-}
 
-const clear = () => process.stdout.write(process.platform === 'win32' ? '\x1Bc' : '\x1B[2J\x1B[3J\x1B[H');
-
-let firstFlip = true;
-
-let readBook = (resolve) => {
-	fs.open(bookPath,'r',(err,fd)=>{
-		if(err)
-			throw err;
-		else{
-			let rl = readline.createInterface(process.stdin,process.stdout);
-			rl.on('line',(line)=>{
-				clear();
-				if(Object.is('d',line) || Object.is('',line)){
-					showWord(fd,'d');
-				}else if(Object.is('u',line)){
-					showWord(fd,'u');
-				}else if(Object.is('q',line)){
-					tool.setHistory(history);
-					rl.close();
-					resolve();
-				}else{
-					log(`\u001b[31m Error: Invalid Command \u001b[39m`)
-				}
-			})
+class ReadBook {
+	constructor(){
+		this.firstFlip = true;
+		this.selectedBookName = history['selected'];
+		this.bookPath = path.join(basePath,'..','book',this.selectedBookName);
+		this.config = history[this.selectedBookName] || {};
+		if(Object.is(this.config[this.selectedBookName],undefined)){
+			history[this.selectedBookName] = this.config;
 		}
-	})
-}
-
-let showWord = (fd,direction) => {
-	let buffer = new Buffer(config.showLength);
-	let [begin,end,step] = [0,buffer.byteLength,buffer.byteLength];
-	
-	if(firstFlip){
-		firstFlip = false;
-	}else{
-		let pos = config.position || 0;
-		if(Object.is(direction,'u') && pos > 0){
-			pos -= step;
+		this.configOper = new ConfigOper(this.config);
+	}
+	readBook(resolve){
+		fs.open(this.bookPath,'r',(err,fd)=>{
+			if(err)
+				throw err;
+			else{
+				let rl = readline.createInterface(process.stdin,process.stdout);
+				rl.setPrompt(`${desc.helpPrompt()}`)
+				rl.prompt();
+				rl.setPrompt('')
+				rl.on('line',(line)=>{
+					tool.clear();
+					if(Object.is('q',line)){
+						tool.setHistory(history);
+						rl.close();
+						resolve();
+					}else{
+						this.handleCmd(fd,line);
+					}
+				})
+			}
+		})
+	}
+	showWord(fd,direction){
+		let showLength = 1024;	//默认显示512个字符
+		if(this.config.showLength){
+			showLength = this.config.showLength;
+		}else{
+			this.config.showLength = showLength;
 		}
-		if(Object.is(direction,'d')){
-			pos += step;
+		
+		let buffer = new Buffer(showLength);
+		let [begin,end,step] = [0,buffer.byteLength,buffer.byteLength];
+		
+		if(this.firstFlip){
+			this.firstFlip = false;
+		}else{
+			let pos = 0;	//默认从0偏移位置显示
+			if(this.config.position){
+				pos = this.config.position;
+			}else{
+				this.config.position = pos;
+			}
+			
+			if(Object.is(direction,'u') && pos > 0){
+				pos -= step;
+			}
+			if(Object.is(direction,'d')){
+				pos += step;
+			}
+			this.config.position = pos;
 		}
-		config.position = pos;
+		
+		fs.read(fd,buffer,begin,end,this.config.position,(err,bytesRead,buffer)=>{
+			if(err){ 
+				console.log(err); 
+				return; 
+			} 
+			console.log(buffer.toString()); 		
+		})
+	}
+	handleCmd(fd,oper){
+		oper = oper.trim();
+		if(oper.startsWith(':')){
+			this.configOper.handleCmd(oper);
+		}else if(oper.startsWith('/')){
+			desc.handleCmd(oper);
+		}else{
+			this.readCmd(fd,oper);
+		}
+	}
+	readCmd(fd,oper){
+		let opers = ['u','d','q',''];
+		if(Object.is('',oper)){
+			oper = 'd';
+		}
+		
+		if(opers.indexOf(oper) > -1){
+			this.showWord(fd,oper);
+		}else{
+			log(desc.invalidCmd());
+		}
 	}
 	
-	fs.read(fd,buffer,begin,end,config.position,(err,bytesRead,buffer)=>{
-		if(err){ 
-			console.log(err); 
-			return; 
-		} 
-		console.log(buffer.toString()); 		
-	})
-}
-
-let setConfig = (resolve,reject) => {
-	let rl = readline.createInterface(process.stdin,process.stdout);
-	let defaultLength = config.showLength / 2 || 521;
-	rl.setPrompt(`User> Please Set Show Word Size Each Time: <${defaultLength}> `);
-	rl.prompt();
-	rl.on('line',(line)=>{
-		let flag = false;
-		if(Object.is('',line)){
-			config.showLength = defaultLength * 2;
-			flag = true;
-		}else{
-			let len = parseInt(line);
-			if(Object.is('q',line)){
-				rl.close();
-				clear();
-			}else if(tool.isNotNumber(line)){
-				log(`\u001b[31m Warn: Please Input A Number \u001b[39m`);
-			}else{
-				config.showLength = parseInt(line) * 2;
-				flag = true;
-			}
-		}
-		if(Object.is(true,flag)){
-			rl.close();
-			return resolve()
-		}
-	})
 }
 
 let run = () => {
 	return new Promise((resolve,reject)=>{
-		tool.showAppOperateInstructions();
-		readBook(resolve);
+		let read = new ReadBook();
+		read.readBook(resolve);
 	}).catch((err)=>{
 		if(err)
 			throw err;
 	})
+	
 }
 
 module.exports = run;
-
-
-
