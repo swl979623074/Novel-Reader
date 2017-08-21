@@ -8,12 +8,14 @@ class ShowCmdDesc{
 			case '/u':this.displayUpCmdDesc();break;
 			case '/d':this.displayDownCmdDesc();break;
 			case '/q':this.displayExitCmdDesc();break;
-			default:Desc.invalidCmd;break;
+			default:
+				console.log(`\u001b[31m Error: Invalid Command \u001b[39m`);
+			break;
 		}
 	}
 	
 	displayHelpCmdDesc(){
-		let desc = `Novel Command List:\n\t/help\t帮助命令,'/'+命令查看命令详细使用\n\t:show [pagesize/pagenumber]	显示系统配置\n\t:set [pagesize/pagenumber]	设置系统配置\n\tq\t退出并保存记录\n\tu\t上翻页\n\tq<enter>\t下翻页\n`;
+		let desc = `Novel Command List:\n\t/help\t帮助命令,'/'+命令查看命令详细使用\n\t:show [pagesize/pagenumber]	显示系统配置\n\t:set [pagesize/pagenumber]	设置系统配置\n\tq\t退出并保存记录\n\tu\t上翻页\n\td<enter>\t下翻页\n`;
 		console.log(desc)
 	}
 	displaySetCmdDesc(){
