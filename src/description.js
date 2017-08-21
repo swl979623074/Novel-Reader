@@ -25,7 +25,7 @@ class ShowCmdDesc{
 		console.log(desc)
 	}
 	displayExitCmdDesc(){
-		let desc = `q使用示例\n\t退出\tq`;
+		let desc = `q使用示例\n\t退出并保存记录\tq`;
 		console.log(desc)
 	}
 	displayUpCmdDesc(){
