@@ -15,15 +15,15 @@ class ShowCmdDesc{
 	}
 	
 	displayHelpCmdDesc(){
-		let desc = `Novel Command List:\n\t/help\t帮助命令,'/'+命令查看命令详细使用\n\t:show [pagesize/pagenumber]	显示系统配置\n\t:set [pagesize/pagenumber]	设置系统配置\n\tq\t退出并保存记录\n\tu\t上翻页\n\td<enter>\t下翻页\n`;
+		let desc = `Novel Command List:\n\t/help\t帮助命令,'/'+命令查看命令详细使用\n\t:show [pagesize(ps)/pagenumber(pn)]	显示系统配置\n\t:set [pagesize/pagenumber]	设置系统配置\n\tq\t退出并保存记录\n\tu\t上翻页\n\td<enter>\t下翻页\n`;
 		console.log(desc)
 	}
 	displaySetCmdDesc(){
-		let desc = `set使用示例\n\t修改页数\t:set pagenumber 100`;
+		let desc = `set使用示例\n\t修改页数\t:set pagenumber/pn 100`;
 		console.log(desc)
 	}
 	displayShowCmdDesc(){
-		let desc = `show使用示例\n\t显示页数\t:show pagenumber`;
+		let desc = `show使用示例\n\t显示页数\t:show pagenumber/pn`;
 		console.log(desc)
 	}
 	displayExitCmdDesc(){

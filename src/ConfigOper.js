@@ -18,6 +18,15 @@ class ConfigOper {
 				cmdComponent.push(val);
 			}
 		})
+		let param = cmdComponent[1];
+		if(!Object.is(param,null)){
+			if(Object.is(param,'pn')){
+				cmdComponent[1] = 'pagenumber';
+			}
+			if(Object.is(param,'ps')){
+				cmdComponent[1] = 'pagesize';
+			}
+		}
 		
 		if(Object.is('set',cmdComponent[0]) && Object.is('pagesize',cmdComponent[1]) && cmdComponent[2]){
 			this.setPageSize(cmdComponent[2]);
