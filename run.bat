@@ -1,2 +1,3 @@
 @echo off
-node app.js
+set pwd=%cd%
+call %pwd%/node app.js
